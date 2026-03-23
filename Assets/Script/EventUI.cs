@@ -1,33 +1,55 @@
-using NUnit.Framework;
 using UnityEngine;
-using System.Collections.Generic;
+using System;
 using UnityEngine.SceneManagement;
+using NUnit.Framework;
+using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 
 public class EventUI : MonoBehaviour
 {
-    public List<GameObject>listaInstrucciones;
-    public int currentIndex = 0;
+    public List<GameObject> listaInstrucciones;
     public List<string> mensajesInstrucciones;
-    public TextMeshProUGUI textMeshProUGUI;
+    public TextMeshProUGUI TextMeshProUGUI;
+    public int currentIndex = 0;
 
     private void Awake()
     {
         DontDestroyOnLoad(this.gameObject);
     }
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        //Actualizar Visibilidad de panels
+        //Actualizas la visibilidad de paneles
         UpdateVisibility();
     }
 
+    // Update is called once per frame
     void Update()
     {
-        
+
     }
 
-    //Metodo para actualizar visibilidad de paneles
+    //Metodos para cambiar de escena
+    public void ChangeSceneByIndex(int sceneIndex)
+    {
+        SceneManager.LoadScene(sceneIndex);
+    }
 
+    public void ChangeSceneByName(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName);
+    }
+
+
+    public void ReloadCurrentScene()
+    {
+        Scene currentScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(currentScene.buildIndex);
+    }
+
+    //Metodo para actualizar la visibilidad de paneles
     private void UpdateVisibility()
     {
         for (int i = 0; i < listaInstrucciones.Count; i++)
@@ -36,43 +58,41 @@ public class EventUI : MonoBehaviour
             listaInstrucciones[i].SetActive(i == currentIndex);
         }
     }
-    //Metodo para cambiar de escena
-    public void ChangeSceneByIndex(int sceneIndex)
-    {
-        SceneManager.LoadScene(sceneIndex);
-    }
 
-    //Metodo para cambiar de escena por nombre
-    public void ChangeSceneByName(string sceneName)
+    //Metodo para cambiar paneles
+    public void CycleObject(int direction)
     {
-        SceneManager.LoadScene(sceneName);
-    }
+        //Incrementa o decrementa el indice y se reinicia
+        currentIndex = (currentIndex + direction + listaInstrucciones.Count) % listaInstrucciones.Count;
 
-    //Metodo para cambiar entre paneles
-    public void CycleObjects()
-    {
-        //Incrementa el indice y vuelve al principio
-        currentIndex = (currentIndex+1)% listaInstrucciones.Count;
-
-        //Actualizar la visibilidad
         UpdateVisibility();
     }
 
-    //Metodo para actualizar el texto
+    //Metodo para cambiar mensajes
+    public void CycleText(int direction)
+    {
+        //Incrementa o decrementa el indice y se reinicia
+        currentIndex = (currentIndex + direction + mensajesInstrucciones.Count) % mensajesInstrucciones.Count;
+
+        UpdateText();
+    }
+
+    //Metodo para actualizar la visibilidad de mensajes
     private void UpdateText()
     {
-        if (mensajesInstrucciones.Count > 0)
+        if (mensajesInstrucciones.Count > 0 && TextMeshProUGUI != null)
         {
-
+            TextMeshProUGUI.text = mensajesInstrucciones[currentIndex];
         }
     }
 
-    //Metodo para salir de la aplicacion
+    //Metodo para salir de la aplicación
     public void ExitGame()
     {
-        //donde vas a hacer la impresion
+        //donde vas a hacer la impresión del mensaje
         Debug.Log("Va a salir");
         Application.Quit();
-        Debug.Log("Ya salio");
+        Debug.Log("Ya salió");
     }
+
 }
